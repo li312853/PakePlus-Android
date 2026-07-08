@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>魅团 - 外卖点单平台</title>
+<style>
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Microsoft YaHei", sans-serif;
+}
+:root{
+	--main-yellow: #ffcc00;
+	--dark-yellow: #ffb300;
+	--light-yellow: #fff9cc;
+	--text-black: #222;
+	--text-gray: #777;
+	--white: #ffffff;
+	--red: #f44336;
+	--star-color: #ff9500;
+	--border: #eeeeee;
+}
+body{
+	background-color: #f7f7f7;
+	padding-bottom: 90px;
+}
+.hide{display: none !important;}
+.flex-center{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 顶部标题栏 */
+.header{
+	width: 100%;
+	height: 52px;
+	background: var(--main-yellow);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 22px;
+	font-weight: bold;
+	color: #222;
+	position: sticky;
+	top: 0;
+	z-index: 99;
+}
+.back-btn{
+	position: absolute;
+	left: 15px;
+	font-size: 26px;
+	cursor: pointer;
+}
+
+/* 页面容器通用 */
+.page{
+	width: 100%;
+	min-height: calc(100vh - 142px);
+	padding: 15px;
+}
+
+/* 首页店铺卡片 */
+.shop-card{
+	background: var(--white);
+	border-radius: 10px;
+	padding: 12px;
+	margin-bottom: 12px;
+	display: flex;
+	gap: 12px;
+}
+.shop-card img{
+	width: 85px;
+	height: 85px;
+	border-radius: 8px;
+	object-fit: cover;
+}
+.shop-info{flex: 1;}
+.shop-name{
+	font-size: 17px;
+	font-weight: 500;
+	margin-bottom: 4px;
+}
+.shop-tag{
+	display: inline-block;
+	font-size: 11px;
+	background: var(--light-yellow);
+	padding: 2px 6px;
+	border-radius: 3px;
+	margin-right: 4px;
+}
+.shop-rate{
+	color: var(--star-color);
+	font-size: 13px;
+	margin: 5px 0;
+}
+.shop-desc{
+	font-size: 13px;
+	color: var(--text-gray);
+	margin-bottom: 6px;
+}
+.enter-shop{
+	background: var(--main-yellow);
+	border: none;
+	padding: 5px 14px;
+	border-radius: 15px;
+	cursor: pointer;
+	font-weight: 500;
+}
+
+/* 店铺详情页 */
+.shop-big-img{
+	width: 100%;
+	height: 180px;
+	border-radius: 10px;
+	object-fit: cover;
+	margin-bottom: 12px;
+}
+.tab-wrap{
+	display: flex;
+	background: #fff;
+	border-radius: 8px;
+	margin-bottom: 12px;
+}
+.tab-item{
+	flex: 1;
+	text-align: center;
+	padding: 10px;
+	font-size: 15px;
+	cursor: pointer;
+}
+.tab-item.active{
+	color: var(--dark-yellow);
+	font-weight: bold;
+	border-bottom: 2px solid var(--dark-yellow);
+}
+
+/* 套餐模块 */
+.package-item{
+	background: var(--white);
+	border-radius: 10px;
+	padding: 12px;
+	margin-bottom: 10px;
+	display: flex;
+	gap: 12px;
+}
+.package-item img{
+	width: 90px;
+	height: 90px;
+	border-radius: 8px;
+	object-fit: cover;
+}
+.package-info{flex: 1;}
+.package-name{
+	font-size: 16px;
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+.package-tag{
+	font-size: 11px;
+	background: var(--light-yellow);
+	padding: 2px 5px;
+	border-radius: 3px;
+	margin-right: 4px;
+}
+.package-text{
+	font-size: 13px;
+	color: var(--text-gray);
+	line-height: 1.5;
+	margin: 6px 0;
+}
+.package-price{
+	color: var(--red);
+	font-weight: bold;
+	font-size: 15px;
+}
+.order-package{
+	background: var(--dark-yellow);
+	border: none;
+	padding: 4px 12px;
+	border-radius: 14px;
+	margin-top: 5px;
+	cursor: pointer;
+}
+
+/* 评论区 */
+.comment-box{
+	background: #fff;
+	border-radius: 10px;
+	padding: 12px;
+}
+.comment-title{
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+.comment-item{
+	background: #fafafa;
+	padding: 10px;
+	border-radius: 6px;
+	margin-bottom: 8px;
+}
+.comment-user{font-size: 13px;font-weight: 500;}
+.comment-star{color: var(--star-color);margin: 4px 0;}
+.comment-text{font-size: 13px;color: #444;line-height: 1.5;}
+
+/* 下单加载动画弹窗 */
+.load-mask{
+	position: fixed;
+	top: 0;left: 0;
+	width: 100%;height: 100%;
+	background: rgba(0,0,0,0.6);
+	z-index: 9999;
+	display: none;
+}
+.load-box{
+	width: 120px;height: 120px;
+	background: #fff;
+	border-radius: 12px;
+	flex-direction: column;
+}
+.load-img{
+	width: 60px;height: 60px;
+	animation: rotate 1s linear infinite;
+}
+@keyframes rotate{
+	0%{transform: rotate(0deg);}
+	100%{transform: rotate(360deg);}
+}
+
+/* 收货信息填写弹窗 */
+.info-mask{
+	position: fixed;
+	top: 0;left: 0;
+	width: 100%;height: 100%;
+	background: rgba(0,0,0,0.7);
+	z-index: 10000;
+	display: none;
+	padding: 15px;
+}
+.info-box{
+	width: 100%;max-width: 400px;
+	background: #fff;border-radius: 10px;padding: 20px;
+}
+.info-title{
+	text-align: center;font-size: 18px;font-weight: bold;margin-bottom: 15px;
+}
+.info-row{margin-bottom: 12px;}
+.info-row label{display:block;margin-bottom:4px;font-size:14px;}
+.info-row input{
+	width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;outline:none;
+}
+.info-submit{
+	width:100%;padding:10px;background:var(--main-yellow);border:none;border-radius:6px;font-weight:bold;cursor:pointer;
+}
+
+/* 商家短信弹窗 */
+.msg-mask{
+	position: fixed;
+	top:0;left:0;width:100%;height:100%;
+	background:rgba(0,0,0,0.7);z-index:10001;display:none;
+	padding:15px;
+}
+.msg-box{
+	width:100%;max-width:360px;background:#fff;border-radius:10px;padding:15px;
+	display:flex;gap:12px;
+}
+.msg-avatar{
+	width:60px;height:60px;border-radius:50%;object-fit:cover;
+}
+.msg-text{flex:1;font-size:14px;line-height:1.6;color:#333;}
+.msg-close{
+	width:100%;margin-top:12px;padding:8px;background:var(--main-yellow);border:none;border-radius:6px;cursor:pointer;
+}
+
+/* 黑屏过渡 */
+.black-mask{
+	position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10002;
+	display:none;
+}
+
+/* 图文小说弹窗 */
+.story-mask{
+	position:fixed;top:0;left:0;width:100%;height:100%;
+	background:rgba(0,0,0,0.8);z-index:10003;display:none;
+	padding:15px;
+}
+.story-box{
+	width:100%;max-width:440px;max-height:92vh;overflow-y:auto;
+	background:#fff;border-radius:12px;padding:20px;
+}
+.story-title{
+	text-align:center;font-size:19px;font-weight:bold;color:var(--dark-yellow);margin-bottom:18px;
+}
+.story-block{margin-bottom:20px;}
+.story-block img{width:100%;border-radius:8px;margin-bottom:10px;}
+.story-text{line-height:1.6;font-size:14px;color:#333;}
+.story-next{
+	width:100%;padding:11px;background:var(--main-yellow);border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:10px;
+}
+
+/* 评价弹窗 */
+.eval-mask{
+	position:fixed;top:0;left:0;width:100%;height:100%;
+	background:rgba(0,0,0,0.7);z-index:10004;display:none;
+	padding:15px;
+}
+.eval-box{
+	width:100%;max-width:400px;background:#fff;border-radius:10px;padding:20px;
+}
+.star-select{margin:10px 0;font-size:28px;color:#ddd;cursor:pointer;}
+.star-select span.active{color:var(--star-color);}
+.eval-textarea{
+	width:100%;height:100px;padding:8px;border:1px solid var(--border);border-radius:6px;outline:none;resize:none;margin:10px 0;
+}
+.eval-submit{
+	width:100%;padding:10px;background:var(--main-yellow);border:none;border-radius:6px;font-weight:bold;cursor:pointer;
+}
+
+/* 开工小游戏弹窗 */
+.game-mask{
+	position:fixed;top:0;left:0;width:100%;height:100%;
+	background:rgba(0,0,0,0.6);z-index:9998;display:none;
+	padding:15px;
+}
+.game-box{
+	width:320px;background:#fff;border-radius:12px;padding:20px;text-align:center;
+}
+.game-desc{margin:10px 0 15px;font-size:14px;}
+.game-target{font-size:32px;margin:15px 0;color:var(--dark-yellow);font-weight:bold;}
+.game-btn{
+	padding:8px 16px;background:var(--main-yellow);border:none;border-radius:6px;margin:0 6px;cursor:pointer;font-weight:bold;
+}
+.game-result{margin-top:15px;font-size:15px;font-weight:bold;}
+
+/* 个人中心页面 */
+.user-card{
+	background:var(--white);border-radius:10px;padding:18px;margin-bottom:15px;
+}
+.avatar-box{
+	display:flex;align-items:center;gap:15px;margin-bottom:16px;
+}
+.avatar-box img{
+	width:75px;height:75px;border-radius:50%;object-fit:cover;border:3px solid var(--main-yellow);
+}
+.avatar-change{
+	padding:4px 10px;border:1px solid var(--dark-yellow);border-radius:12px;font-size:13px;cursor:pointer;
+}
+.user-input-item{margin-bottom:14px;}
+.user-input-item label{display:block;margin-bottom:5px;font-size:14px;}
+.user-input-item input{
+	width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;outline:none;font-size:14px;
+}
+.balance-show{
+	font-size:19px;color:var(--red);font-weight:bold;margin:10px 0;
+}
+.save-user-btn{
+	width:100%;padding:11px;background:var(--main-yellow);border:none;border-radius:8px;font-weight:bold;cursor:pointer;
+}
+
+/* 全局提示弹窗 */
+.tip-mask{
+	position:fixed;top:0;left:0;width:100%;height:100%;
+	background:rgba(0,0,0,0.5);z-index:9997;display:none;
+	padding:15px;
+}
+.tip-box{
+	width:290px;background:#fff;border-radius:10px;padding:22px;text-align:center;
+}
+.tip-text{font-size:15px;line-height:1.6;margin-bottom:18px;}
+.tip-confirm{
+	padding:6px 22px;background:var(--main-yellow);border:none;border-radius:6px;cursor:pointer;font-weight:bold;
+}
+
+/* 底部导航 */
+.footer-nav{
+	position:fixed;bottom:0;left:0;width:100%;height:82px;
+	background:#fff;display:flex;align-items:center;border-top:1px solid var(--border);
+}
+.nav-item{
+	flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:var(--text-gray);
+}
+.nav-item.active{color:var(--dark-yellow);}
+.nav-item img{width:26px;height:26px;margin-bottom:4px;}
+.nav-work-wrap{flex:1.4;display:flex;justify-content:center;}
+.work-main-btn{
+	width:62px;height:62px;border-radius:50%;background:var(--main-yellow);border:none;font-size:15px;font-weight:bold;box-shadow:0 2px 8px #ffcc0077;cursor:pointer;
+}
+</style>
+</head>
+<body>
+<!-- 顶部标题 -->
+<div class="header">
+	<span class="back-btn hide" id="shopBackBtn" onclick="backHome()">←</span>
+	魅团
+</div>
+
+<!-- 页面1：首页大厅10家店铺 -->
+<div class="page" id="pageHome">
+	<div class="shop-card" onclick="openShopDetail(0)">
+		<img src="/img/shop1.png" alt="炸鸡汉堡店">
+		<div class="shop-info">
+			<div class="shop-name">咔滋炸鸡汉堡店</div>
+			<div>
+				<span class="shop-tag">炸鸡</span>
+				<span class="shop-tag">汉堡</span>
+			</div>
+			<div class="shop-rate">★ 4.8 月售2000+</div>
+			<div class="shop-desc">30分钟送达，满25减10，单人套餐实惠</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(1)">
+		<img src="/img/shop2.png" alt="骨汤麻辣烫">
+		<div class="shop-info">
+			<div class="shop-name">鲜熬骨汤麻辣烫</div>
+			<div>
+				<span class="shop-tag">麻辣烫</span>
+				<span class="shop-tag">米线</span>
+			</div>
+			<div class="shop-rate">★ 4.7 月售1600+</div>
+			<div class="shop-desc">多种辣度可选，荤素齐全，单人饱腹套餐</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(2)">
+		<img src="/img/shop3.png" alt="奶茶甜品">
+		<div class="shop-info">
+			<div class="shop-name">蜜语奶茶甜品铺</div>
+			<div>
+				<span class="shop-tag">奶茶</span>
+				<span class="shop-tag">蛋糕</span>
+			</div>
+			<div class="shop-rate">★ 4.9 月售3200+</div>
+			<div class="shop-desc">鲜果茶、奶油甜品，下午茶组合套餐</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(3)">
+		<img src="/img/shop4.png" alt="中式快餐">
+		<div class="shop-info">
+			<div class="shop-name">万家中式简餐</div>
+			<div>
+				<span class="shop-tag">盖浇饭</span>
+				<span class="shop-tag">便当</span>
+			</div>
+			<div class="shop-rate">★ 4.6 月售1100+</div>
+			<div class="shop-desc">家常炒菜便当，米饭无限续，上班族首选</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(4)">
+		<img src="/img/shop5.png" alt="烧烤夜宵">
+		<div class="shop-info">
+			<div class="shop-name">深夜烟火烧烤</div>
+			<div>
+				<span class="shop-tag">烧烤</span>
+				<span class="shop-tag">夜宵</span>
+			</div>
+			<div class="shop-rate">★ 4.5 月售900+</div>
+			<div class="shop-desc">炭火现烤，双人分享烧烤套餐，营业至凌晨2点</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(5)">
+		<img src="/img/shop6.png" alt="螺蛳粉">
+		<div class="shop-info">
+			<div class="shop-name">正宗柳州螺蛳粉</div>
+			<div>
+				<span class="shop-tag">螺蛳粉</span>
+				<span class="shop-tag">小吃</span>
+			</div>
+			<div class="shop-rate">★ 4.7 月售1400+</div>
+			<div class="shop-desc">加腐竹加炸蛋，原味/微辣/特辣可选</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(6)">
+		<img src="/img/shop7.png" alt="披萨意面">
+		<div class="shop-info">
+			<div class="shop-name">意式手工披萨</div>
+			<div>
+				<span class="shop-tag">披萨</span>
+				<span class="shop-tag">意面</span>
+			</div>
+			<div class="shop-rate">★ 4.8 月售800+</div>
+			<div class="shop-desc">现烤芝士披萨，单人意面套餐，拉丝浓郁</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(7)">
+		<img src="/img/shop8.png" alt="饺子馄饨">
+		<div class="shop-info">
+			<div class="shop-name">北方手工水饺馆</div>
+			<div>
+				<span class="shop-tag">饺子</span>
+				<span class="shop-tag">馄饨</span>
+			</div>
+			<div class="shop-rate">★ 4.6 月售1000+</div>
+			<div class="shop-desc">现包水饺，鲜肉虾仁馅，配醋包蒜水</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(8)">
+		<img src="/img/shop9.png" alt="寿司刺身">
+		<div class="shop-info">
+			<div class="shop-name">浅草日式寿司店</div>
+			<div>
+				<span class="shop-tag">寿司</span>
+				<span class="shop-tag">刺身</span>
+			</div>
+			<div class="shop-rate">★ 4.9 月售700+</div>
+			<div class="shop-desc">手握寿司拼盘，单人精致日料套餐</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+	<div class="shop-card" onclick="openShopDetail(9)">
+		<img src="/img/shop10.png" alt="火锅冒菜">
+		<div class="shop-info">
+			<div class="shop-name">一人一锅冒菜</div>
+			<div>
+				<span class="shop-tag">冒菜</span>
+				<span class="shop-tag">单人火锅</span>
+			</div>
+			<div class="shop-rate">★ 4.7 月售1300+</div>
+			<div class="shop-desc">牛油麻辣汤底，荤素自由搭配，单人小火锅</div>
+			<button class="enter-shop">进店点餐</button>
+		</div>
+	</div>
+</div>
+
+<!-- 页面2：店铺详情页 -->
+<div class="page hide" id="pageShop">
+	<img class="shop-big-img" id="shopBigImg" src="" alt="商家大图">
+	<div class="tab-wrap">
+		<div class="tab-item active" id="tabPack" onclick="switchTab('pack')">套餐</div>
+		<div class="tab-item" id="tabComment" onclick="switchTab('comment')">评价</div>
+	</div>
+	<!-- 套餐区域 -->
+	<div id="packWrap">
+		<div class="package-item" data-id="pack1">
+			<img src="/img/pack1.png" alt="香辣炸鸡单人套餐">
+			<div class="package-info">
+				<div class="package-name">香辣脆皮炸鸡单人套餐</div>
+				<div>
+					<span class="package-tag">爆款</span>
+					<span class="package-tag">单人</span>
+				</div>
+				<div class="package-text">整块鸡腿炸鸡+中杯可乐+原味薯条，单人饱腹标配，微辣酥脆</div>
+				<div class="package-price">售价 ¥29</div>
+				<button class="order-package" onclick="createOrder(29,'pack1')">立即下单</button>
+			</div>
+		</div>
+		<div class="package-item" data-id="pack2">
+			<img src="/img/pack2.png" alt="双层牛肉堡套餐">
+			<div class="package-info">
+				<div class="package-name">双层牛肉汉堡豪华套餐</div>
+				<div>
+					<span class="package-tag">肉食</span>
+					<span class="package-tag">热销</span>
+				</div>
+				<div class="package-text">双层厚切牛肉饼+芝士片+上校鸡块+冰红茶，肉食爱好者首选</div>
+				<div class="package-price">售价 ¥38</div>
+				<button class="order-package" onclick="createOrder(38,'pack2')">立即下单</button>
+			</div>
+		</div>
+		<div class="package-item" data-id="pack3">
+			<img src="/img/pack3.png" alt="清汤麻辣烫套餐">
+			<div class="package-info">
+				<div class="package-name">鲜香骨汤麻辣烫套餐</div>
+				<div>
+					<span class="package-tag">骨汤</span>
+					<span class="package-tag">荤素</span>
+				</div>
+				<div class="package-text">十几种荤素配菜，骨汤汤底，配方便面，辣度可选，清淡不油腻</div>
+				<div class="package-price">售价 ¥24</div>
+				<button class="order-package" onclick="createOrder(24,'pack3')">立即下单</button>
+			</div>
+		</div>
+		<div class="package-item" data-id="pack4">
+			<img src="/img/pack4.png" alt="奶茶甜品下午茶">
+			<div class="package-info">
+				<div class="package-name">珍珠奶茶甜品下午茶套餐</div>
+				<div>
+					<span class="package-tag">甜品</span>
+					<span class="package-tag">饮品</span>
+				</div>
+				<div class="package-text">大杯珍珠奶绿+草莓大福+蛋挞两份，下午茶解腻小食组合</div>
+				<div class="package-price">售价 ¥20</div>
+				<button class="order-package" onclick="createOrder(20,'pack4')">立即下单</button>
+			</div>
+		</div>
+		<div class="package-item" data-id="pack5">
+			<img src="/img/pack5.png" alt="双人烧烤小套餐">
+			<div class="package-info">
+				<div class="package-name">迷你烧烤双人套餐</div>
+				<div>
+					<span class="package-tag">双人</span>
+					<span class="package-tag">夜宵</span>
+				</div>
+				<div class="package-text">烤五花肉、烤肠、金针菇、锡纸土豆，送两份米饭，适合两人分享</div>
+				<div class="package-price">售价 ¥46</div>
+				<button class="order-package" onclick="createOrder(46,'pack5')">立即下单</button>
+			</div>
+		</div>
+	</div>
+	<!-- 评价区域 -->
+	<div class="comment-box hide" id="commentWrap">
+		<div class="comment-title">全部用户评价</div>
+		<div id="commentList"></div>
+	</div>
+</div>
+
+<!-- 页面3：个人中心 -->
+<div class="page hide" id="pageUser">
+	<div class="user-card">
+		<div class="avatar-box">
+			<img id="userAvatarImg" src="/img/avatar_default.png" alt="用户头像">
+			<button class="avatar-change" onclick="changeAvatar()">更换头像</button>
+		</div>
+		<div class="user-input-item">
+			<label>用户昵称</label>
+			<input type="text" id="userNickInput" placeholder="输入你的昵称">
+		</div>
+		<div>
+			<p>账户余额</p>
+			<p class="balance-show">¥<span id="balanceNum">600</span></p>
+		</div>
+		<button class="save-user-btn" onclick="saveUserData()">保存信息</button>
+	</div>
+</div>
+
+<!-- 下单加载动画弹窗 -->
+<div class="load-mask flex-center" id="loadMask">
+	<div class="load-box flex-center">
+		<img class="load-img" src="/img/load.png" alt="加载">
+		<p style="margin-top:10px;font-size:14px">正在下单...</p>
+	</div>
+</div>
+
+<!-- 收货信息填写弹窗 -->
+<div class="info-mask flex-center" id="infoMask">
+	<div class="info-box">
+		<h3 class="info-title">填写收货信息</h3>
+		<div class="info-row">
+			<label>收货人姓名</label>
+			<input type="text" id="recvName">
+		</div>
+		<div class="info-row">
+			<label>手机号码</label>
+			<input type="tel" id="recvPhone">
+		</div>
+		<div class="info-row">
+			<label>详细收货地址（用餐地点）</label>
+			<input type="text" id="recvAddr" placeholder="小区/公司/宿舍">
+		</div>
+		<button class="info-submit" onclick="submitRecvInfo()">确认提交</button>
+	</div>
+</div>
+
+<!-- 商家短信弹窗 -->
+<div class="msg-mask flex-center" id="msgMask">
+	<div class="msg-box">
+		<img class="msg-avatar" id="msgShopAvatar" src="" alt="商家头像">
+		<div class="msg-text" id="msgContent"></div>
+	</div>
+	<button class="msg-close" onclick="closeMsg()">知道了</button>
+</div>
+
+<!-- 黑屏过渡遮罩 -->
+<div class="black-mask" id="blackMask"></div>
+
+<!-- 图文小说弹窗 -->
+<div class="story-mask flex-center" id="storyMask">
+	<div class="story-box">
+		<h3 class="story-title">美食食用全过程</h3>
+		<div class="story-block">
+			<img src="/img/eat1.png" alt="外卖送达">
+			<p class="story-text"><span id="sName1"></span>在家【<span id="sAddr1"></span>】听到敲门声，外卖小哥准时送达温热餐品，黄色魅团保温袋牢牢锁住热气，包装完整无撒漏。</p>
+		</div>
+		<div class="story-block">
+			<img src="/img/eat2.png" alt="拆开包装">
+			<p class="story-text"><span id="sName2"></span>回到桌面拆开保温袋，掀开餐盒瞬间香气弥漫全屋，所有菜品分类摆放，酱料独立分装干净卫生。</p>
+		</div>
+		<div class="story-block">
+			<img src="/img/eat3.png" alt="第一口品尝">
+			<p class="story-text"><span id="sName3"></span>拿起餐具吃下第一口，食材口感恰到好处，调味咸香适中，连日工作的疲惫瞬间被美食抚平。</p>
+		</div>
+		<div class="story-block">
+			<img src="/img/eat4.png" alt="搭配饮品">
+			<p class="story-text"><span id="sName4"></span>搭配套餐附赠冰饮，一口主食一口汽水，中和油腻，冷热交织带来满满的幸福感。</p>
+		</div>
+		<div class="story-block">
+			<img src="/img/eat5.png" alt="全部吃完">
+			<p class="story-text"><span id="sName5"></span>不知不觉吃完整份套餐，胃里充实温暖，在【<span id="sAddr5"></span>】悠闲享受完这一餐，所有烦恼暂时消散。</p>
+		</div>
+		<button class="story-next" onclick="openEvaluate()">吃完，评价套餐</button>
+	</div>
+</div>
+
+<!-- 评价弹窗 -->
+<div class="eval-mask flex-center" id="evalMask">
+	<div class="eval-box">
+		<h3 style="text-align:center;margin-bottom:10px">评价本次套餐</h3>
+		<div class="star-select" id="starBox">
+			<span data-s="1">★</span>
+			<span data-s="2">★</span>
+			<span data-s="3">★</span>
+			<span data-s="4">★</span>
+			<span data-s="5">★</span>
+		</div>
+		<textarea class="eval-textarea" id="evalContent" placeholder="写下你的用餐感受..."></textarea>
+		<button class="eval-submit" onclick="submitEvaluate()">提交评价</button>
+	</div>
+</div>
+
+<!-- 开工外卖小游戏弹窗 -->
+<div class="game-mask flex-center" id="gameMask">
+	<div class="game-box">
+		<h3>外卖配送小游戏</h3>
+		<p class="game-desc">快速点击【接单】，数字匹配目标即可赚钱！</p>
+		<p>目标数字：</p>
+		<div class="game-target" id="gameTarget">0</div>
+		<button class="game-btn" id="gameBtn" onclick="gameClick()">接单</button>
+		<button class="game-btn" onclick="closeGame()">退出</button>
+		<div class="game-result" id="gameResult"></div>
+	</div>
+</div>
+
+<!-- 全局提示弹窗 -->
+<div class="tip-mask flex-center" id="tipMask">
+	<div class="tip-box">
+		<p class="tip-text" id="tipText"></p>
+		<button class="tip-confirm" onclick="closeTip()">确定</button>
+	</div>
+</div>
+
+<!-- 底部导航 -->
+<div class="footer-nav">
+	<div class="nav-item active" id="navHomeBtn" onclick="switchPage('home')">
+		<img src="/img/icon_home.png" alt="首页">
+		<span>首页</span>
+	</div>
+	<div class="nav-work-wrap">
+		<button class="work-main-btn" onclick="startWorkGame()">开工</button>
+	</div>
+	<div class="nav-item" id="navUserBtn" onclick="switchPage('user')">
+		<img src="/img/icon_user.png" alt="个人">
+		<span>个人</span>
+	</div>
+</div>
+
+<script>
+// ================== 全局数据 ==================
+// 商家数据 每家对应专属短信文案、商家大图
+const shopData = [
+	{img:"/img/shop1_big.png",avatar:"/img/shop1.png",msg:"您好，我是咔滋炸鸡外卖员，我已经到你家门口啦，麻烦开门取一下炸鸡~"},
+	{img:"/img/shop2_big.png",avatar:"/img/shop2.png",msg:"顾客您好，麻辣烫送到楼下门口啦，骨汤趁热吃味道更好！"},
+	{img:"/img/shop3_big.png",avatar:"/img/shop3.png",msg:"奶茶甜品已送到家门口，冰饮记得尽快饮用哦！"},
+	{img:"/img/shop4_big.png",avatar:"/img/shop4.png",msg:"简餐便当送达，米饭还热乎，慢用~"},
+	{img:"/img/shop5_big.png",avatar:"/img/shop5.png",msg:"烧烤外卖到家门口啦，趁热吃口感最佳！"},
+	{img:"/img/shop6_big.png",avatar:"/img/shop6.png",msg:"螺蛳粉送到，小心汤汁烫嘴，祝你用餐愉快！"},
+	{img:"/img/shop7_big.png",avatar:"/img/shop7.png",msg:"披萨意面已到家门口，芝士趁热拉丝更好吃！"},
+	{img:"/img/shop8_big.png",avatar:"/img/shop8.png",msg:"手工水饺送到门口，醋包蒜水都给你配齐啦！"},
+	{img:"/img/shop9_big.png",avatar:"/img/shop9.png",msg:"寿司拼盘送达，新鲜食材尽快享用！"},
+	{img:"/img/shop10_big.png",avatar:"/img/shop10.png",msg:"单人冒菜火锅送到家门口，小心锅底烫！"}
+];
+let userInfo = {
+	nick: "魅团食客",
+	avatar: "/img/avatar_default.png",
+	balance: 600,
+	isOrderLocked: false,
+	nowPackId: "",
+	nowShopIndex: 0
+};
+let recvInfo = {name:"",phone:"",addr:""};
+let allComments = JSON.parse(localStorage.getItem("mtComment")) || {};
+let gameNum = 0, targetNum = 0, earnMoney = 0, selectStar = 0;
+
+// ================== DOM缓存 ==================
+const pageHome = document.getElementById("pageHome");
+const pageShop = document.getElementById("pageShop");
+const pageUser = document.getElementById("pageUser");
+const shopBackBtn = document.getElementById("shopBackBtn");
+const shopBigImg = document.getElementById("shopBigImg");
+const balanceNum = document.getElementById("balanceNum");
+const userNickInput = document.getElementById("userNickInput");
+const userAvatarImg = document.getElementById("userAvatarImg");
+const tabPack = document.getElementById("tabPack");
+const tabComment = document.getElementById("tabComment");
+const packWrap = document.getElementById("packWrap");
+const commentWrap = document.getElementById("commentWrap");
+const commentList = document.getElementById("commentList");
+const loadMask = document.getElementById("loadMask");
+const infoMask = document.getElementById("infoMask");
+const recvName = document.getElementById("recvName");
+const recvPhone = document.getElementById("recvPhone");
+const recvAddr = document.getElementById("recvAddr");
+const msgMask = document.getElementById("msgMask");
+const msgShopAvatar = document.getElementById("msgShopAvatar");
+const msgContent = document.getElementById("msgContent");
+const blackMask = document.getElementById("blackMask");
+const storyMask = document.getElementById("storyMask");
+const sName1 = document.getElementById("sName1");
+const sName2 = document.getElementById("sName2");
+const sName3 = document.getElementById("sName3");
+const sName4 = document.getElementById("sName4");
+const sName5 = document.getElementById("sName5");
+const sAddr1 = document.getElementById("sAddr1");
+const sAddr5 = document.getElementById("sAddr5");
+const evalMask = document.getElementById("evalMask");
+const starBox = document.getElementById("starBox");
+const evalContent = document.getElementById("evalContent");
+const gameMask = document.getElementById("gameMask");
+const gameTarget = document.getElementById("gameTarget");
+const gameResult = document.getElementById("gameResult");
+const tipMask = document.getElementById("tipMask");
+const tipText = document.getElementById("tipText");
+const navHomeBtn = document.getElementById("navHomeBtn");
+const navUserBtn = document.getElementById("navUserBtn");
+
+// ================== 初始化 ==================
+function initLoad(){
+	balanceNum.innerText = userInfo.balance;
+	userNickInput.value = userInfo.nick;
+	userAvatarImg.src = userInfo.avatar;
+	renderAllComment();
+	const stars = starBox.querySelectorAll("span");
+	stars.forEach(star=>{
+		star.onclick = function(){
+			selectStar = Number(this.dataset.s);
+			stars.forEach(s=>s.classList.remove("active"));
+			for(let i=0;i<selectStar;i++) stars[i].classList.add("active");
+		}
+	})
+}
+initLoad();
+
+// 渲染全部评论
+function renderAllComment(){
+	commentList.innerHTML = "";
+	for(let packId in allComments){
+		allComments[packId].forEach(item=>{
+			let starStr = "";
+			for(let i=0;i<item.star;i++) starStr += "★";
+			const html = `
+				<div class="comment-item">
+					<div class="comment-user">${item.nick}</div>
+					<div class="comment-star">${starStr}</div>
+					<div class="comment-text">${item.text}</div>
+				</div>
+			`;
+			commentList.innerHTML += html;
+		})
+	}
+}
+
+// 页面切换 首页/个人
+function switchPage(type){
+	pageHome.classList.add("hide");
+	pageShop.classList.add("hide");
+	pageUser.classList.add("hide");
+	shopBackBtn.classList.add("hide");
+	navHomeBtn.classList.remove("active");
+	navUserBtn.classList.remove("active");
+	if(type === "home"){
+		pageHome.classList.remove("hide");
+		navHomeBtn.classList.add("active");
+	}else if(type === "user"){
+		pageUser.classList.remove("hide");
+		navUserBtn.classList.add("active");
+	}
+}
+// 打开店铺详情
+function openShopDetail(index){
+	userInfo.nowShopIndex = index;
+	shopBigImg.src = shopData[index].img;
+	pageHome.classList.add("hide");
+	pageShop.classList.remove("hide");
+	shopBackBtn.classList.remove("hide");
+	switchTab("pack");
+}
+// 返回大厅
+function backHome(){
+	pageShop.classList.add("hide");
+	pageHome.classList.remove("hide");
+	shopBackBtn.classList.add("hide");
+}
+// 切换套餐/评价标签
+function switchTab(type){
+	tabPack.classList.remove("active");
+	tabComment.classList.remove("active");
+	packWrap.classList.add("hide");
+	commentWrap.classList.add("hide");
+	if(type === "pack"){
+		tabPack.classList.add("active");
+		packWrap.classList.remove("hide");
+	}else{
+		tabComment.classList.add("active");
+		commentWrap.classList.remove("hide");
+		renderAllComment();
+	}
+}
+
+// ================== 下单主流程 ==================
+function createOrder(price,packId){
+	userInfo.nowPackId = packId;
+	if(userInfo.isOrderLocked){
+		showTip("你还有未评价订单，请先完成评价！");
+		return;
+	}
+	if(userInfo.balance < price){
+		showTip(`余额不足！套餐${price}元\n余额：${userInfo.balance}\n点击底部开工赚钱`);
+		return;
+	}
+	// 1.扣余额
+	userInfo.balance -= price;
+	balanceNum.innerText = userInfo.balance;
+	userInfo.isOrderLocked = true;
+	// 2.下单加载动画
+	loadMask.style.display = "flex";
+	setTimeout(()=>{
+		loadMask.style.display = "none";
+		// 3.弹出收货信息填写
+		infoMask.style.display = "flex";
+	},1500)
+}
+// 提交收货信息
+function submitRecvInfo(){
+	let n = recvName.value.trim();
+	let p = recvPhone.value.trim();
+	let a = recvAddr.value.trim();
+	if(!n||!p||!a){
+		showTip("请完整填写姓名、手机号、收货地址！");
+		return;
+	}
+	recvInfo.name = n;
+	recvInfo.phone = p;
+	recvInfo.addr = a;
+	infoMask.style.display = "none";
+	// 4.延迟3秒弹出商家专属短信
+	setTimeout(()=>{
+		msgShopAvatar.src = shopData[userInfo.nowShopIndex].avatar;
+		msgContent.innerText = shopData[userInfo.nowShopIndex].msg;
+		msgMask.style.display = "flex";
+	},3000)
+}
+// 关闭短信，黑屏亮屏跳转小说
+function closeMsg(){
+	msgMask.style.display = "none";
+	blackMask.style.display = "block";
+	setTimeout(()=>{
+		blackMask.style.display = "none";
+		// 填充小说姓名、用餐地点
+		let nick = userInfo.nick;
+		let addr = recvInfo.addr;
+		sName1.innerText = nick; sName2.innerText = nick; sName3.innerText = nick; sName4.innerText = nick; sName5.innerText = nick;
+		sAddr1.innerText = addr; sAddr5.innerText = addr;
+		storyMask.style.display = "flex";
+	},800)
+}
+
+// ================== 评价系统 ==================
+function openEvaluate(){
+	storyMask.style.display = "none";
+	evalMask.style.display = "flex";
+	selectStar = 0;
+	evalContent.value = "";
+	document.querySelectorAll("#starBox span").forEach(s=>s.classList.remove("active"));
+}
+function submitEvaluate(){
+	if(selectStar === 0){
+		showTip("请选择星级评分！");
+		return;
+	}
+	let text = evalContent.value.trim();
+	if(!text){
+		showTip("请填写用餐评价！");
+		return;
+	}
+	const commentObj = {nick:userInfo.nick,star:selectStar,text:text};
+	if(!allComments[userInfo.nowPackId]) allComments[userInfo.nowPackId] = [];
+	allComments[userInfo.nowPackId].push(commentObj);
+	localStorage.setItem("mtComment",JSON.stringify(allComments));
+	renderAllComment();
+	evalMask.style.display = "none";
+	userInfo.isOrderLocked = false;
+	showTip("评价提交成功，可在套餐评价区查看！");
+}
+
+// ================== 开工外卖小游戏 ==================
+function startWorkGame(){
+	gameMask.style.display = "flex";
+	gameResult.innerText = "";
+	targetNum = Math.floor(Math.random()*10)+1;
+	gameTarget.innerText = targetNum;
+	gameNum = 0;
+}
+function gameClick(){
+	gameNum++;
+	if(gameNum === targetNum){
+		earnMoney = Math.floor(Math.random()*101)+100;
+		userInfo.balance += earnMoney;
+		balanceNum.innerText = userInfo.balance;
+		gameResult.innerText = `配送成功！赚取${earnMoney}元`;
+		setTimeout(()=>{
+			closeGame();
+			showTip(`打工完成，获得${earnMoney}元\n当前余额：${userInfo.balance}`);
+		},1200)
+	}else if(gameNum > targetNum){
+		earnMoney = Math.floor(Math.random()*50)+100;
+		userInfo.balance += earnMoney;
+		balanceNum.innerText = userInfo.balance;
+		gameResult.innerText = `超时配送，仅得${earnMoney}元`;
+		setTimeout(()=>{
+			closeGame();
+			showTip(`配送超时，奖励${earnMoney}元\n当前余额：${userInfo.balance}`);
+		},1200)
+	}
+}
+function closeGame(){
+	gameMask.style.display = "none";
+}
+
+// ================== 个人信息 ==================
+function changeAvatar(){
+	showTip("模拟头像上传：替换/img目录avatar_default.png即可更换");
+}
+function saveUserData(){
+	let newNick = userNickInput.value.trim();
+	if(!newNick){
+		showTip("昵称不能为空！");
+		return;
+	}
+	userInfo.nick = newNick;
+	showTip("用户信息保存成功！");
+}
+
+// ================== 通用提示弹窗 ==================
+function showTip(txt){
+	tipText.innerText = txt;
+	tipMask.style.display = "flex";
+}
+function closeTip(){
+	tipMask.style.display = "none";
+}
+</script>
+</body>
+</html>
